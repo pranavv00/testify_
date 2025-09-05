@@ -1,26 +1,28 @@
-import os
+import streamlit as st
 import google.generativeai as genai
 from dotenv import load_dotenv
+import os
 
-# Load API key
+# Load environment variables
 load_dotenv()
-api_key = os.getenv("GEMINI_API_KEY")
 
-if not api_key:
-    raise ValueError("Set your GEMINI_API_KEY in a .env file!")
+# Configure Gemini API
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
-# Configure Gemini
-genai.configure(api_key=api_key)
+# App title
+st.title("🚀 Testify – AI-Powered Test Case Generator")
+st.caption("Transforming requirements into test cases instantly")
 
-# Initialize model
-model = genai.GenerativeModel("gemini-1.5-flash")
+# Input field
+feature_description = st.text_area("📝 Enter feature/requirement description:")
 
-# Prompt
-prompt = "Generate 5 detailed test cases for login functionality with inputs and expected outputs."
+# Generate button
+if st.button("Generate Test Cases"):
+    if feature_description.strip():
+        model = genai.GenerativeModel("gemini-pro")
+        response = model.generate_content(f"Generate test cases for: {feature_description}")
 
-# Generate response
-response = model.generate_content(prompt)
-
-# Print
-print(response.text)
-    
+        st.subheader("✅ Generated Test Cases")
+        st.write(response.text)
+    else:
+        st.warning("Please enter a feature description first.")
